@@ -31,8 +31,6 @@ const insertCat = (name, age, breed, owner, img_link, rate, favourite, descripti
 
 
 
-
-
 module.exports = db;
 
 // const sqlite3 = require('sqlite3').verbose();

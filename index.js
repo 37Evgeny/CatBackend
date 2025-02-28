@@ -54,21 +54,79 @@ app.delete('/cats/:id', (req, res) => {
     });
 });
 
-app.post('/cats/:id/like', (req, res) => {
+app.get('/cats/:id', (req, res) => {
     const catId = req.params.id;
-    const userId = req.user.id; // ID аутентифицированного пользователя
-    // Логика для добавления лайка в базу данных
-});
 
-app.delete('/cats/:id/like', (req, res) => {
-    const catId = req.params.id;
-    const userId = req.user.id; // ID аутентифицированного пользователя
-    // Логика для удаления лайка из базы данных
-});
+    // SQL-запрос для получения информации о коте
+    const getCatSql = `SELECT * FROM cats WHERE id = ?`;
+
+    db.get(getCatSql, [catId], (err, row) => {
+        if (err) {
+            console.error('Ошибка при получении кота:', err.message);
+            return res.status(500).json({ message: 'Ошибка сервера. Попробуйте позже.' });
+        }
+
+        if (!row) {
+            return res.status(404).json({ message: 'Кот не найден.' });
+        }
+
+        // // Получение количества лайков для кота
+        // const getLikesCountSql = `SELECT COUNT(*) as likesCount FROM likes WHERE catId = ?`;
+        // db.get(getLikesCountSql, [catId], (err, likesRow) => {
+        //     if (err) {
+        //         console.error('Ошибка при получении количества лайков:', err.message);
+        //         return res.status(500).json({ message: 'Ошибка сервера. Попробуйте позже.' });
+        //     }
+
+            // Формирование ответа
+            const response = {
+                id: row.id,
+                name: row.name,
+                age: row.age,
+                breed: row.breed,
+                img_link: row.img_link,
+                description: row.description
+            };
+
+            res.json(response);
+        });
+    });
+// });
+
+// app.post('/cats/:id/like', (req, res) => {
+//     const catId = req.params.id;
+
+//     // Проверка существования лайка
+//     const checkLikeSql = `SELECT * FROM likes WHERE catId = ?`;
+//     db.get(checkLikeSql, [catId], (err, row) => {
+//         if (err) {
+//             console.error('Ошибка при проверке лайка:', err.message);
+//             return res.status(500).json({ message: 'Ошибка сервера. Попробуйте позже.' });
+//         }
+
+//         if (row) {
+//             // Лайк уже существует
+//             return res.status(400).json({ message: 'Вы уже поставили лайк этому котику.' });
+//         }
+
+//         // Добавление нового лайка
+//         const insertLikeSql = `INSERT INTO likes catId VALUES = ?`;
+//         db.run(insertLikeSql, [catId], function(err) {
+//             if (err) {
+//                 console.error('Ошибка вставки лайка:', err.message);
+//                 return res.status(500).json({ message: 'Ошибка сервера. Попробуйте позже.' });
+//             }
+//             res.status(201).json({ message: 'Лайк успешно добавлен.' });
+//         });
+//     });
+// });
+
 
 
 
 // Запуск сервера
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
